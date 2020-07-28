@@ -14,11 +14,17 @@ import paho.mqtt.client as mqtt
 from phue import Bridge
 from spotipy.oauth2 import SpotifyClientCredentials
 
+### FR und Bugfix:
+# FR: https://github.com/ggravlingen/pytradfri Trådfri Integration
+# FR: https://docs.python.org/3/library/configparser.html Config Datei mit Nutzerdaten
+# FR: GUI für die Anwendungswerte und Nutzerwerte
+# FR: Hue Farbe vor Start merken und am Ende wiederherstellen
+
 ### Nutzerwerte
-username = 'lasee123'
+username = 'username'
 mqttIp = 'localhost'
-bridgeIp = '192.168.2.125'
-hueLamps = [4,5]
+bridgeIp = 'philips-hue'
+hueLamps = [] #Fill with lamp-ids e. g: [4,5]
 
 ### Anwendungswerte
 mqttEnabled = True
@@ -26,9 +32,10 @@ bridgeEnabled = True
 consoleEnabled = True
 debug = False
 filter = 0.0
-offset = 0
-hueOffset = -50
+offset = 200
+hueOffset = -0
 cooldown = 100
+brightness = 1.0 * 254
 
 ### Variablen
 logger = logging.getLogger('SpotifyLightIntegration')
@@ -177,6 +184,8 @@ def getCurrentTrack(token, sc):
         songID = trackId
     except spotipy.exceptions.SpotifyException:
         logger.error("Fehler mit den Berechtigungen")
+    except TypeError:
+        logger.error("Token abgelaufen oder Musik zu lange pausiert")
 
 def clearHue():
     if bridgeEnabled:
@@ -223,7 +232,7 @@ def valueToHSV(value):
     a = {}
     a["h"] = remapValue(value)*65535
     a["s"] = 254
-    a["v"] = 30
+    a["v"] = brightness
     return a
 def evaluateHue(sc, duration, value):
     if value > filter:
