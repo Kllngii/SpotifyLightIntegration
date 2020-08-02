@@ -17,7 +17,7 @@ def setEnviron():
     os.environ["SPOTIPY_CLIENT_ID"] = "def1a61cd5434c3f8dd75740d2da049c"
     os.environ["SPOTIPY_CLIENT_SECRET"] = "c847178ddadc4fd59b4f1e03508a05ba"
     os.environ["SPOTIPY_REDIRECT_URI"] = "http://localhost:8080"
-    os.environ["BRIGHTNESS"] = str(0.1)
+    os.environ["BRIGHTNESS"] = str(0.6)
 
 def valueToHSV(value):
     if value == 0:

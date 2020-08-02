@@ -25,7 +25,7 @@ class SpotifyHandler():
     features = None
     analysis = None
     startTime = None
-    offset = 100
+    offset = 0
     cooldownBeats = 200
     filter = 0
     useBeats = True
@@ -57,13 +57,21 @@ class SpotifyHandler():
     def getCurrentTrack(self):
         sp = spotipy.Spotify(auth=self.token)
         track = sp.current_user_playing_track()
-        if track["is_playing"] is not True:
+        if track is None:
+            for i in self.sc.queue:
+                self.sc.cancel(i)
+            isPaused = True
+            wasPaused = True
+            self.logger.info("Wiedergabe ist zu lange pausiert oder Spotify wurde beendet!")
+        elif track["is_playing"] is not True:
             if self.wasPaused is not True:
                 for i in self.sc.queue:
                     self.sc.cancel(i)
                 self.wasPaused = True
+                self.logger.info("Wiedergabe wurde pausiert!")
             #FIXME: Licht hier eventuell per clearLight() ausschalten!
-            self.logger.info("Wiedergabe pausiert!")
+            else:
+                self.logger.info("Wiedergabe ist pausiert!")
         else:
             self.logger.debug(str(track["item"]["name"]))
             self.logger.debug(track["progress_ms"] - self.delay*1000 - self.progress)
